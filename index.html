@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            transition: background 0.5s ease-in-out; 
+            background-repeat: no-repeat;
+            background-image: url('https://www.shutterstock.com/image-photo/heavy-rain-tree-parking-260nw-681346432.jpg'); /* Default background */
+        }
+
+        .a {
+            text-align: center;
+        }
+
+        .b {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+            width: 90%; 
+            max-width: 450px; 
+        }
+
+        .b:hover {
+            transform: scale(1.05);
+        }
+
+        .c {
+            padding: 15px;
+            margin: 10px 0;
+            width: 70%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .c:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+
+        .c::placeholder {
+            color: #aaa;
+        }
+
+        .d {
+            padding: 10px;
+            background-color: #2196F3;
+            color: whitesmoke;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .d:hover {
+            background-color: #1565C0;
+        }
+
+        .e {
+            display: none;
+        }
+
+        .f {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+
+        .g {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .h {
+            font-size: 16px;
+            color: rgb(255, 0, 0);
+        }
+
+        .i {
+            font-size: 14px;
+            color: rgb(255, 0, 0);
+        }
+
+        
+        @media (max-width: 768px) {
+            .b {
+                width: 80%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .b {
+                width: 90%;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="a">
+        <div class="b">
+            <h1 style="color: green;">
+                Weather App
+            </h1>
+            <input type="text" class="c" placeholder="Enter city name">
+            <button class="d" onclick="weatherFn($('.c').val())">Get Weather Details</button>
+            <div class="e">
+                <h3 class="city-name"></h3>
+                <p class="i"></p>
+                <p class="f"></p>
+                <p class="g"></p>
+                <p class="h"></p>
+                <i class="fas fa-sun"></i> 
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://momentjs.com/downloads/moment.min.js"></script>
+    <script>
+        const url = 'https://api.openweathermap.org/data/2.5/weather';
+        const apiKey = 'f00c38e0279b7bc85480c3fe775d518c';
+
+        async function weatherFn(cName) {
+            const temp = `${url}?q=${cName}&appid=${apiKey}&units=metric`;
+            try {
+                const res = await fetch(temp);
+                const data = await res.json();
+                if (res.ok) {
+                    weatherShowFn(data);
+                } else {
+                    alert('City not found. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+            }
+        }
+
+        function weatherShowFn(data) {
+            $('.city-name').text(data.name);
+            $('.i').text(moment().format('MMMM Do YYYY, h:mm:ss a'));
+            $('.f').html(`${data.main.temp}°C`);
+            $('.g').text(data.weather[0].description);
+            $('.h').html(`Wind Speed: ${data.wind.speed} m/s`);
+
+            const weatherCondition = data.weather[0].main.toLowerCase();
+
+            let backgroundUrl;
+
+            switch (weatherCondition) {
+                case 'clear':
+                    backgroundUrl = 'https://media.istockphoto.com/id/491701259/photo/blue-sky-with-sun.jpg?s=612x612&w=0&k=20&c=aB7c-e0YFezBb8cgSykiEcAh_2fXEie3inIudnsNa9g=';
+                    break;
+                case 'clouds':
+                    backgroundUrl = 'https://media.istockphoto.com/id/1352315937/photo/beautiful-blue-sky-with-cumulus-clouds.jpg?s=612x612&w=0&k=20&c=ybOK14vAG7_S_6STJdo66CeSa14nMieDHzxchWQmtMw=';
+                    break;
+                case 'rain':
+                case 'drizzle':
+                    backgroundUrl = 'https://www.shutterstock.com/image-photo/heavy-rain-tree-parking-260nw-681346432.jpg';
+                    break;
+                case 'thunderstorm':
+                    backgroundUrl = 'https://media.istockphoto.com/id/1196121876/photo/lightning-thunderstorm-flashes.jpg?s=612x612&w=0&k=20&c=bfmxr-X0tFPQUmEkNf2_iZxXRx0c_mN3Q6Yf-uHKrdo=';
+                    break;
+                case 'snow':
+                    backgroundUrl = 'https://media.istockphoto.com/id/1289963982/photo/winter-snow-covered-trees.jpg?s=612x612&w=0&k=20&c=y-vNNnC5Y28VfYmcaa4p3aeky6Ltx9dbt8YZAPeJflE=';
+                    break;
+                case 'mist':
+                case 'fog':
+                    backgroundUrl = 'https://media.istockphoto.com/id/1204873761/photo/road-in-the-forest.jpg?s=612x612&w=0&k=20&c=ymuCLJpbfm0ro0b_m2BZcyzUOkmHiHjcYgGBExWzCZQ=';
+                    break;
+                default:
+                    backgroundUrl = 'https://www.shutterstock.com/image-photo/heavy-rain-tree-parking-260nw-681346432.jpg';
+                    break;
+            }
+
+            $('body').css('background-image', `url(${backgroundUrl})`);
+            $('.e').fadeIn();
+        }
+    </script>
+</body>
+</html>
